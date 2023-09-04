@@ -39,8 +39,8 @@ func (m *Module) Name() string {
 	return "gogen"
 }
 
-func (m *Module) Execute(targets map[string]pgs.File, pkgs map[string]pgs.Package) []pgs.Artifact {
-	for _, t := range targets {
+func (m *Module) Execute(files map[string]pgs.File, pkgs map[string]pgs.Package) []pgs.Artifact {
+	for _, f := range files {
 		// gfname := m.ctx.OutputPath(t).SetExt(".go").String()
 
 		// outdir := m.Parameters().Str("outdir")
@@ -48,7 +48,7 @@ func (m *Module) Execute(targets map[string]pgs.File, pkgs map[string]pgs.Packag
 		// if outdir != "" {
 		// 	filename = filepath.Join(outdir, gfname)
 		// }
-		opts := t.File().Descriptor().GetOptions()
+		opts := f.File().Descriptor().GetOptions()
 		rawOpt := proto.GetExtension(opts, gogen.E_Generate)
 		opt, ok := rawOpt.(string)
 		if !ok {
