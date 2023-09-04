@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/golang/protobuf/proto"
 	pgs "github.com/lyft/protoc-gen-star/v2"
 	pgsgo "github.com/lyft/protoc-gen-star/v2/lang/go"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/ucpr/protoc-gen-gogen/gogen"
 )
 
@@ -48,15 +49,12 @@ func (m *Module) Execute(targets map[string]pgs.File, pkgs map[string]pgs.Packag
 		// 	filename = filepath.Join(outdir, gfname)
 		// }
 		opts := t.File().Descriptor().GetOptions()
-		rawOpt, err := proto.GetExtension(opts, gogen.E_Generate)
-		if err != nil {
-			panic(err)
-		}
-		opt, ok := rawOpt.(*string)
+		rawOpt := proto.GetExtension(opts, gogen.E_Generate)
+		opt, ok := rawOpt.(string)
 		if !ok {
 			panic(fmt.Errorf("unable to convert extension to string"))
 		}
-		fmt.Println(*opt)
+		fmt.Println(opt)
 
 		// buf := new(bytes.Buffer)
 		// m.OverwriteGeneratorFile(filename, buf.String())
