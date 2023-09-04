@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package example;
+
+import "gogen/gogen.proto";
+
+option go_package = "github.com/ucpr/protoc-gen-gogen/example;exmaple";
+
+option (gogen.generate) = "echo 1";
+
+message Example {
+    string with_new_tags = 1;
+    string with_new_multiple = 2;
+    optional string replace_default = 3;
+}
+
+message SecondMessage {
+    string with_new_tags = 1 ;
+    string with_new_multiple = 2;
+    string replace_default = 3;
+}
+
+message ThirdExample {
+    message InnerExample {
+        string id = 1;
+        int32 yes = 2;
+    }
+    InnerExample inner_example = 1;
+}
