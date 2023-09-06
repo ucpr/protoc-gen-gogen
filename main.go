@@ -1,18 +1,23 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
+	"os"
+	"path/filepath"
 
 	pgs "github.com/lyft/protoc-gen-star/v2"
 	pgsgo "github.com/lyft/protoc-gen-star/v2/lang/go"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/pluginpb"
 
 	"github.com/ucpr/protoc-gen-gogen/gogen"
 )
 
 func main() {
+	optional := uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+
 	pgs.Init(
-		pgs.DebugEnv("DEBUG"),
+		pgs.DebugEnv("DEBUG"), pgs.SupportedFeatures(&optional),
 	).RegisterModule(
 		New(),
 	).RegisterPostProcessor(
@@ -41,23 +46,28 @@ func (m *Module) Name() string {
 
 func (m *Module) Execute(files map[string]pgs.File, pkgs map[string]pgs.Package) []pgs.Artifact {
 	for _, f := range files {
-		// gfname := m.ctx.OutputPath(t).SetExt(".go").String()
+		gfname := m.ctx.OutputPath(f).SetExt(".go").String()
 
-		// outdir := m.Parameters().Str("outdir")
-		// filename := gfname
-		// if outdir != "" {
-		// 	filename = filepath.Join(outdir, gfname)
-		// }
-		opts := f.File().Descriptor().GetOptions()
-		rawOpt := proto.GetExtension(opts, gogen.E_Generate)
-		opt, ok := rawOpt.(string)
-		if !ok {
-			panic(fmt.Errorf("unable to convert extension to string"))
+		outdir := m.Parameters().Str("outdir")
+		filename := gfname
+		if outdir != "" {
+			filename = filepath.Join(outdir, gfname)
 		}
-		fmt.Println(opt)
+		opts := f.File().Descriptor().GetOptions()
+		ropt := proto.GetExtension(opts, gogen.E_GoGenerate)
+		opt, ok := ropt.(string)
+		if !ok {
+			continue
+		}
 
-		// buf := new(bytes.Buffer)
-		// m.OverwriteGeneratorFile(filename, buf.String())
+		data, err := os.ReadFile(filename)
+		_ = err
+
+		buf := new(bytes.Buffer)
+		buf.WriteString("//go:generate " + opt + "\n\n")
+		buf.Write(data)
+
+		m.OverwriteGeneratorFile(filename, buf.String())
 	}
 
 	return m.Artifacts()
