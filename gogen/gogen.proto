@@ -7,5 +7,5 @@ import "google/protobuf/descriptor.proto";
 option go_package = "github.com/ucpr/protoc-gen-gogen/gogen;gogen";
 
 extend google.protobuf.FileOptions {
-  string generate = 60000;
+  string go_generate = 60000;
 }

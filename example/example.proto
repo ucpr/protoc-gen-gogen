@@ -6,7 +6,7 @@ import "gogen/gogen.proto";
 
 option go_package = "github.com/ucpr/protoc-gen-gogen/example;exmaple";
 
-option (gogen.generate) = "echo 1";
+option (gogen.go_generate) = "echo 1";
 
 message Example {
     string with_new_tags = 1;
